@@ -855,11 +855,12 @@ local function Decompile(bytecode)
 							expectation = { ["type"] = "NAMECALL", ["value"] = `{modifyRegister(B)}:{tostring(k.value)}` }
 							--nextIsAux = true
 						end
-						opConstructors["FORNPREP"] = function() -- prepare numeric loop
-							--TODO: read instructions before fornprep and show their values (and clear them away)
-							-- also remove step if its 1
-							protoOutput ..= `for {modifyRegister(A + 2)} = {modifyRegister(A + 2)}, {modifyRegister(A)}, {modifyRegister(A + 1)} do -- [escape at #{insnIndex + sD}]`
-						end
+						opConstructors["FORNPREP"] = function()
+                                                       local step = modifyRegister(A + 1)
+                                                       protoOutput ..= step == "1" and 
+                                                       `for {modifyRegister(A + 2)} = {modifyRegister(A + 2)}, {modifyRegister(A)} do -- [escape at #{insnIndex + sD}]` or 
+                                                       `for {modifyRegister(A + 2)} = {modifyRegister(A + 2)}, {modifyRegister(A)}, {step} do -- [escape at #{insnIndex + sD}]`
+                                                end
 						opConstructors["FORNLOOP"] = function()
 							protoOutput ..= "end" .. ` -- FORNLOOP end - iterate + goto #{insnIndex + sD}`
 						end
